@@ -1,32 +1,23 @@
 package main
 
 import (
-	// Import the gorilla/mux library we just installed
-	"fmt"
-	"net/http"
+	"golab/routes"
+	"golab/utils"
 
-	"github.com/gorilla/mux"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	// Declare a new router
-	r := mux.NewRouter()
+	utils.Connect()
 
-	r.HandleFunc("/", home).Methods("GET")
+	app := fiber.New()
 
-	r.HandleFunc("/login", login).Methods("POST")
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+	}))
 
-	r.HandleFunc("/register", register).Methods("POST")
+	routes.Setup(app)
 
-	http.ListenAndServe(":8080", r)
-}
-
-func home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Home Page!")
-}
-
-func register(w http.ResponseWriter, r *http.Request) {
-}
-
-func login(w http.ResponseWriter, r *http.Request) {
+	app.Listen(":8000")
 }
