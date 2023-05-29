@@ -2,36 +2,18 @@ package routes
 
 import (
 	// "golab/controllers"
-	// "golab/home"
+	"golab/home"
+
+	"golab/controllers"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App) {
 
-	app.Post("/api/register", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "success",
-		})
-	})
-	app.Post("/api/login", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "success",
-		})
-	})
-	app.Get("/api/user", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "success",
-		})
-	})
-	app.Post("/api/logout", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "success",
-		})
-	})
-	app.Get("/api/home", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "success",
-		})
-	})
+	app.Post("/api/register", controllers.Register)
+	app.Post("/api/login", controllers.Login)
+	app.Get("/api/user", controllers.User)
+	app.Post("/api/logout", controllers.Logout)
+	app.Get("/api/home", home.Home)
 }
