@@ -4,13 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func Home(c *fiber.Ctx) error {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 	endpoint := "http://api.weatherapi.com/v1/current.json"
-	apiKey := "fd0fd746633a4a23acf172353232905"
+	apiKey := os.Getenv("API")
 
 	type WeatherResponse struct {
 		Location struct {
