@@ -21,7 +21,7 @@ const Home = (props: { name: string }) => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        const response = await fetch('http://localhost:8000/api/weather', {
+        const response = await fetch('http://goback-1ssr.onrender.com/api/weather', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',

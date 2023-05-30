@@ -15,7 +15,7 @@ function App() {
   useEffect(() => {
       (
           async () => {
-              const response = await fetch('http://localhost:8000/api/user', {
+              const response = await fetch('http://goback-1ssr.onrender.com/api/user', {
                   headers: {'Content-Type': 'application/json'},
                   credentials: 'include',
               });

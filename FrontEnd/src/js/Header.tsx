@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom";
 const Header = (props: { name: string, setName: (name: string) => void }) => {
 
       const logout = async () => {
-        await fetch('http://localhost:8000/api/logout', {
+        await fetch('http://goback-1ssr.onrender.com/api/logout', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
