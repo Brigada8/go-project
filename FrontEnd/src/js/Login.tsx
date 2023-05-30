@@ -24,7 +24,7 @@ const Login = (props: { setName: (name: string) => void }) => {
 
         setRedirect(true);
         props.setName(content.name);
-        content
+        console.log(content)
         
     }
 
