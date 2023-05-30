@@ -26,7 +26,7 @@ const Header = (props: { name: string, setName: (name: string) => void }) => {
 
     let menu;
 
-    if (props.name === '') {
+    if (props.name === undefined) {
         menu = (
           <div className='define'>
           <MDBBtn onClick={()=>navigate("/login")}>LogIn</MDBBtn>

@@ -51,7 +51,9 @@ const Home = (props: { name: string }) => {
 
     let menu;
 
-    if (props.name === '') {
+    console.log(props.name)
+
+    if (props.name === undefined) {
         menu = (
         <div className='back'>
             <div className='p-5 text-center bg-image' style={{ backgroundImage: "url('https://wallpaperaccess.com/full/1540016.jpg')", height: '500px', width: "100%" }}>
