@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"golab/routes"
 	"golab/utils"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -13,13 +13,12 @@ func main() {
 
 	app := fiber.New()
 
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+		AllowOrigins:     "https://gofront.onrender.com, 35.160.120.126, 44.233.151.27, 34.211.200.85",
+		AllowHeaders:     "Origin, Content-Type, Accept",
+	}))
+	routes.Setup(app)
+
 	app.Listen(":8000")
-}
-
-func HelloHandler(w http.ResponseWriter, _ *http.Request) {
-
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "https://gofront.onrender.com/")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	fmt.Fprintf(w, "Hello, there!")
 }

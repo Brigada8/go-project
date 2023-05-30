@@ -29,8 +29,6 @@ function App() {
               setName(content.Name);
               console.log(content)
               
-              
-             
           }
       )();
   });
