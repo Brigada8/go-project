@@ -28,7 +28,7 @@ func TestFiberPost(t *testing.T) {
 	server := fiber.New()
 
 	input := struct {
-		Name     string `json:"name`
+		Name     string `json:"name"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}{

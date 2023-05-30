@@ -1,13 +1,9 @@
-import React, {SyntheticEvent, useState} from 'react';
+import {SyntheticEvent, useState} from 'react';
 import '../css/Header.css'
 import {useNavigate} from "react-router-dom";
 import { MDBInput } from 'mdb-react-ui-kit';
 import {
-    MDBCard,
-    MDBCardBody,
-    MDBCardTitle,
-    MDBCardText,
-    MDBCardImage,
+
     MDBBtn
   } from 'mdb-react-ui-kit';
 

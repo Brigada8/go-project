@@ -1,5 +1,4 @@
-import React from 'react';
-import { MDBBtn } from 'mdb-react-ui-kit';
+
 import '../css/Header.css'
 
 const Footer = () => {
