@@ -69,6 +69,7 @@ func Login(c *fiber.Ctx) error {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
 			"message": "could not login",
+			"name":    user.Name,
 		})
 	}
 

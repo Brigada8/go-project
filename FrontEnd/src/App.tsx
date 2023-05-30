@@ -23,6 +23,9 @@ function App() {
               const content = await response.json();
 
               setName(content.Name);
+              
+              
+             
           }
       )();
   });
@@ -33,6 +36,7 @@ function App() {
                   <Header  name={name} setName={setName}/>
 
                 <main className="">
+                  
                     <Routes>
                     <Route path="/" element={<Home name={name}/>}/>
                     <Route path="/login" element={<Login setName={setName}/>}/>

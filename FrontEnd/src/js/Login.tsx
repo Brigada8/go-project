@@ -1,5 +1,5 @@
 import React, {SyntheticEvent, useState} from 'react';
-import {Navigate} from "react-router-dom";
+import {Navigate ,useNavigate} from "react-router-dom";
 
 const Login = (props: { setName: (name: string) => void }) => {
     const [email, setEmail] = useState('');

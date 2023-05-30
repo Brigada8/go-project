@@ -14,6 +14,7 @@ const Header = (props: { name: string, setName: (name: string) => void }) => {
         });
 
         props.setName('');
+        window.location.reload();
     }
 
     const navigate = useNavigate();
