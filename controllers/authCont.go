@@ -66,13 +66,10 @@ func Login(c *fiber.Ctx) error {
 
 	token, err := claims.SignedString([]byte(SecretKey))
 
-	fmt.Println(user.Name)
-
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
 			"message": "could not login",
-			"name":    user.Name,
 		})
 	}
 
@@ -85,8 +82,11 @@ func Login(c *fiber.Ctx) error {
 
 	c.Cookie(&cookie)
 
+	fmt.Println(user.Name)
+
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"name":    user.Name,
 	})
 }
 
