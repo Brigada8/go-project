@@ -5,6 +5,7 @@ import Header from "./js/Header"
 import Home from "./js/Home"
 import Login from "./js/Login"
 import Register from "./js/Register"
+import Footer from "./js/Footer"
 
 
 function App() {
@@ -22,7 +23,6 @@ function App() {
               const content = await response.json();
 
               setName(content.Name);
-              console.log(content)
           }
       )();
   });
@@ -32,7 +32,7 @@ function App() {
                   <BrowserRouter>
                   <Header  name={name} setName={setName}/>
 
-                <main className="form-signin">
+                <main className="">
                     <Routes>
                     <Route path="/" element={<Home name={name}/>}/>
                     <Route path="/login" element={<Login setName={setName}/>}/>
@@ -40,6 +40,8 @@ function App() {
                     </Routes>
                 </main>
             </BrowserRouter>
+            <Footer/>
+
     </>
   )
 }

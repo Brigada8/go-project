@@ -24,6 +24,7 @@ const Login = (props: { setName: (name: string) => void }) => {
 
         setRedirect(true);
         props.setName(content.name);
+        
     }
 
     if (redirect) {
@@ -31,7 +32,7 @@ const Login = (props: { setName: (name: string) => void }) => {
     }
 
     return (
-        <form onSubmit={submit}>
+        <form className='form-signin' onSubmit={submit}>
             <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
             <input type="email" className="form-control" placeholder="Email address" required
                    onChange={e => setEmail(e.target.value)}

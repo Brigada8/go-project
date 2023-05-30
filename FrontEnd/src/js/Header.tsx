@@ -1,6 +1,7 @@
 import '../css/Header.css'
 import { MDBInput } from 'mdb-react-ui-kit';
 import { MDBBtn } from 'mdb-react-ui-kit';
+import {useNavigate} from "react-router-dom";
 
 
 const Header = (props: { name: string, setName: (name: string) => void }) => {
@@ -15,20 +16,36 @@ const Header = (props: { name: string, setName: (name: string) => void }) => {
         props.setName('');
     }
 
+    const navigate = useNavigate();
+
+
+    let menu;
+
+    if (props.name === undefined) {
+        menu = (
+          <div className='define'>
+          <MDBBtn onClick={()=>navigate("/login")}>LogIn</MDBBtn>
+          <MDBBtn onClick={()=>navigate("/register")} >Register</MDBBtn>
+          </div>
+        )
+    }else{
+      menu = (
+        <div className='define'>
+          <MDBBtn onClick={logout} >LogOut</MDBBtn>
+          </div>
+      )
+    }
+
     return (
         <>
         <div className="header">
             <div className='define'>
-            <img className='logo' src='https://www.transparentpng.com/thumb/temperature/climate-control-home-temperature-png-17.png'/>
+            <a onClick={()=>navigate("/")}> <img className='logo' src='https://www.transparentpng.com/thumb/temperature/climate-control-home-temperature-png-17.png'/> </a>
             <h1> Get your current weather now! </h1>
             </div>
-            <div className='define'>
-            <input className='text' placeholder='text' />
-            <MDBBtn onClick={logout} >Button</MDBBtn>
-            </div>
+            {menu}
         </div>
       </>
     );
   }
   export default Header
-  
