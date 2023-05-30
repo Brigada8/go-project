@@ -17,7 +17,7 @@ function App() {
           async () => {
               const response = await fetch('https://goback-1ssr.onrender.com/api/user', {
                 headers: {'Content-Type': 'application/json'},
-                credentials: 'same-origin',
+                credentials: 'include',
               });
 
               const content = await response.json();
