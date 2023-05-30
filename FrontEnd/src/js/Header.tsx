@@ -8,7 +8,7 @@ const Header = (props: { name: string, setName: (name: string) => void }) => {
 
       const logout = async () => {
         await fetch('https://goback-1ssr.onrender.com/api/logout', {
-          headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json'},
             method: 'GET',
             credentials: 'include',
         });
