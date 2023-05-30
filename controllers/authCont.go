@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"golab/models"
 	"golab/utils"
 	"strconv"
@@ -81,8 +80,6 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
-
-	fmt.Println(user.Name)
 
 	return c.JSON(fiber.Map{
 		"message": "success",
