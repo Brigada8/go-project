@@ -27,6 +27,7 @@ function App() {
               const content = await response.json();
 
               setName(content.Name);
+              console.log(content)
               
               
              
