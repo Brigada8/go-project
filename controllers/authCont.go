@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"golab/models"
 	"golab/utils"
 	"strconv"
@@ -64,6 +65,8 @@ func Login(c *fiber.Ctx) error {
 	})
 
 	token, err := claims.SignedString([]byte(SecretKey))
+
+	fmt.Println(user.Name)
 
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
