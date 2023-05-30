@@ -124,3 +124,9 @@ func Logout(c *fiber.Ctx) error {
 		"message": "success",
 	})
 }
+
+func newApp() *fiber.App {
+	app := fiber.New()
+	app.Get("/api/user", User)
+	return app
+}
