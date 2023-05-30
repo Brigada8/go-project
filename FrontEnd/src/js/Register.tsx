@@ -11,11 +11,7 @@ const Register = () => {
         e.preventDefault();
 
         await fetch('https://goback-1ssr.onrender.com/api/register', {
-            mode: 'cors',
-            headers: {
-                'Access-Control-Allow-Origin':'*',
-                'Content-Type': 'application/json'
-              },
+            headers: {'Content-Type': 'application/json'},
             method: 'POST',
             body: JSON.stringify({
                 name,

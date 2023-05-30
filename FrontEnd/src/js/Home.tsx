@@ -22,11 +22,7 @@ const Home = (props: { name: string }) => {
         e.preventDefault();
 
         const response = await fetch('https://goback-1ssr.onrender.com/api/weather', {
-            mode: 'cors',
-            headers: {
-                'Access-Control-Allow-Origin':'*',
-                'Content-Type': 'application/json'
-              },
+            headers: {'Content-Type': 'application/json'},
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({
