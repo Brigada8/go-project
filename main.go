@@ -2,14 +2,14 @@ package main
 
 import (
 	"golab/handlers"
-	"golab/internal"
+	"golab/internal/weather/repositories"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	internal.Connect()
+	repositories.Connect()
 
 	app := fiber.New()
 

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"golab/internal"
+	"golab/internal/weather/repositories"
 	"strconv"
 	"time"
 
@@ -27,7 +28,7 @@ func Register(c *fiber.Ctx) error {
 		Password: password,
 	}
 
-	internal.DB.Create(&user)
+	repositories.DB.Create(&user)
 
 	return c.JSON(user)
 }
@@ -41,7 +42,7 @@ func Login(c *fiber.Ctx) error {
 
 	var user internal.User
 
-	internal.DB.Where("email = ?", data["email"]).First(&user)
+	repositories.DB.Where("email = ?", data["email"]).First(&user)
 
 	if user.Id == 0 {
 		c.Status(fiber.StatusNotFound)
@@ -102,7 +103,7 @@ func User(c *fiber.Ctx) error {
 
 	var user internal.User
 
-	internal.DB.Where("id = ?", claims.Issuer).First(&user)
+	repositories.DB.Where("id = ?", claims.Issuer).First(&user)
 
 	return c.JSON(user)
 }
