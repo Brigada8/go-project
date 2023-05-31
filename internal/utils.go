@@ -1,8 +1,7 @@
-package utils
+package internal
 
 import (
 	"fmt"
-	"golab/models"
 
 	"github.com/glebarez/sqlite"
 
@@ -23,7 +22,7 @@ func Connect() {
 
 	// Migrate the schema
 	DB.AutoMigrate(
-		&models.User{})
+		&User{})
 
 	fmt.Println("Successfully connected!", DB)
 }

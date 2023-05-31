@@ -1,8 +1,7 @@
-package controllers
+package handlers
 
 import (
-	"golab/models"
-	"golab/utils"
+	"golab/internal"
 	"strconv"
 	"time"
 
@@ -22,13 +21,13 @@ func Register(c *fiber.Ctx) error {
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
-	user := models.User{
+	user := internal.User{
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
 	}
 
-	utils.DB.Create(&user)
+	internal.DB.Create(&user)
 
 	return c.JSON(user)
 }
@@ -40,9 +39,9 @@ func Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	var user models.User
+	var user internal.User
 
-	utils.DB.Where("email = ?", data["email"]).First(&user)
+	internal.DB.Where("email = ?", data["email"]).First(&user)
 
 	if user.Id == 0 {
 		c.Status(fiber.StatusNotFound)
@@ -101,9 +100,9 @@ func User(c *fiber.Ctx) error {
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
-	var user models.User
+	var user internal.User
 
-	utils.DB.Where("id = ?", claims.Issuer).First(&user)
+	internal.DB.Where("id = ?", claims.Issuer).First(&user)
 
 	return c.JSON(user)
 }

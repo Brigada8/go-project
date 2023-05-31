@@ -1,4 +1,4 @@
-package home
+package weather
 
 import (
 	"encoding/json"
@@ -6,12 +6,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/joho/godotenv"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
-func Home(c *fiber.Ctx) error {
+func Weather(c *fiber.Ctx) error {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
