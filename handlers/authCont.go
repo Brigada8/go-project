@@ -76,6 +76,7 @@ func Login(c *fiber.Ctx) error {
 		Name:    "jwt",
 		Value:   token,
 		Expires: time.Now().Add(time.Hour * 24),
+		Domain:  "gofront.onrender.com",
 	}
 
 	c.Cookie(&cookie)

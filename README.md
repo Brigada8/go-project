@@ -10,11 +10,16 @@ A Weather report app.
 
 - Build a Web App
 
+- Application should display default weather infromation based on your ip location
+
+- Applicaton should 
+
 
 
 ## Features
 
 - Usage of third-party weather API.
-- Authentication.
 - Display Weather information.
+- Users regisrtation.
+- Users authorization and autentification.
 

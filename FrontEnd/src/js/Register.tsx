@@ -10,7 +10,7 @@ const Register = () => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        await fetch('https://goback-1ssr.onrender.com/register', {
+        await fetch('https://goback-1ssr.onrender.com/api/register', {
             headers: {'Content-Type': 'application/json'},
             method: 'POST',
             body: JSON.stringify({
