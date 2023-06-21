@@ -1,7 +1,7 @@
-package handlers
+package services
 
 import (
-	"golab/internal"
+	"golab/internal/weather"
 	"golab/internal/weather/repositories"
 	"strconv"
 	"time"
@@ -22,7 +22,7 @@ func Register(c *fiber.Ctx) error {
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
-	user := internal.User{
+	user := weather.User{
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
@@ -40,7 +40,7 @@ func Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	var user internal.User
+	var user weather.User
 
 	repositories.DB.Where("email = ?", data["email"]).First(&user)
 
@@ -102,7 +102,7 @@ func User(c *fiber.Ctx) error {
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
-	var user internal.User
+	var user weather.User
 
 	repositories.DB.Where("id = ?", claims.Issuer).First(&user)
 

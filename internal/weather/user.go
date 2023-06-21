@@ -1,4 +1,4 @@
-package internal
+package weather
 
 type User struct {
 	Id       uint   `json:"id"`

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"fmt"
-	"golab/internal"
+	internal "golab/internal/weather"
 
 	"github.com/glebarez/sqlite"
 
