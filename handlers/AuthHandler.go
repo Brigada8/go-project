@@ -1,7 +1,8 @@
-package services
+package handlers
 
 import (
 	"golab/internal/weather"
+	Models "golab/internal/weather"
 	"golab/internal/weather/repositories"
 	"strconv"
 	"time"
@@ -13,7 +14,24 @@ import (
 
 const SecretKey = "secret"
 
-func Register(c *fiber.Ctx) error {
+type HttpHandler struct {
+	authService AuthService
+}
+
+type AuthService interface {
+	AddUser(c *fiber.Ctx, user Models.User) (string, error)
+	GetUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (string, error)
+	GetUserByEmail(c *fiber.Ctx, data map[string]string) (string, error)
+	Destroy(c *fiber.Ctx) (string, error)
+}
+
+func NewHttpHandler(apiService ApiService, authService AuthService) *HttpHandler {
+	return &HttpHandler{
+		authService: authService,
+	}
+}
+
+func (h *HttpHandler) Register(c *fiber.Ctx) error {
 	var data map[string]string
 
 	if err := c.BodyParser(&data); err != nil {
@@ -22,18 +40,18 @@ func Register(c *fiber.Ctx) error {
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
-	user := weather.User{
+	user := Models.User{
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
 	}
 
-	repositories.DB.Create(&user)
+	h.authService.AddUser(c, user)
 
 	return c.JSON(user)
 }
 
-func Login(c *fiber.Ctx) error {
+func (h *HttpHandler) Login(c *fiber.Ctx) error {
 	var data map[string]string
 
 	if err := c.BodyParser(&data); err != nil {
@@ -86,7 +104,7 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
-func User(c *fiber.Ctx) error {
+func (h *HttpHandler) User(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt")
 
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -104,28 +122,10 @@ func User(c *fiber.Ctx) error {
 
 	var user weather.User
 
-	repositories.DB.Where("id = ?", claims.Issuer).First(&user)
+	h.authService.GetUserByID(c, claims)
 
 	return c.JSON(user)
 }
-
-func Logout(c *fiber.Ctx) error {
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    "",
-		Expires:  time.Now().Add(-time.Hour),
-		HTTPOnly: true,
-	}
-
-	c.Cookie(&cookie)
-
-	return c.JSON(fiber.Map{
-		"message": "success",
-	})
-}
-
-func newApp() *fiber.App {
-	app := fiber.New()
-	app.Get("/api/user", User)
-	return app
+func (h *HttpHandler) Logout(c *fiber.Ctx) {
+	h.authService.Destroy(c)
 }

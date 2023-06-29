@@ -1,16 +1,14 @@
 package handlers
 
 import (
-	"golab/internal/weather/services"
-
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App) {
 
-	app.Post("/api/register", services.Register)
-	app.Post("/api/login", services.Login)
-	app.Get("/api/logout", services.Logout)
-	app.Post("/api/weather", services.Weather)
-	app.Get("/api/user", services.User)
+	app.Post("/api/register")
+	app.Post("/api/login", handlers.Login)
+	app.Get("/api/logout", handlers.Logout)
+	app.Post("/api/weather", handlers.Weather)
+	app.Get("/api/user", handlers.User)
 }

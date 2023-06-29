@@ -1,4 +1,4 @@
-package weather
+package handlers
 
 import (
 	"encoding/json"
@@ -10,7 +10,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Weather(c *fiber.Ctx) error {
+type ApiService interface {
+}
+
+func (h *HttpHandler) Weather(c *fiber.Ctx) error {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
