@@ -20,7 +20,7 @@ func NewUserRepository(DB *gorm.DB) *UserRepository {
 }
 
 func (o *UserRepository) CreateUser(c *fiber.Ctx, user Models.User) (string, error) {
-	DB.Create(user)
+	DB.Create(&user)
 	return "", c.JSON(user)
 }
 

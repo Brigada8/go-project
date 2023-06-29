@@ -1,55 +1,78 @@
-package login_test
+package handlers_test
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"golab/internal/weather/repositories"
-	"io"
+	"golab/internal/weather/services/AuthServices"
 	"net/http"
-	"os"
+	"net/http/httptest"
 	"testing"
 
+	"golab/handlers"
+	"golab/internal/weather"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/steinfletcher/apitest"
 	"github.com/stretchr/testify/assert"
 )
 
-func BenchmarkLogin(b *testing.B) {
+func TestHttpHandler_Register(t *testing.T) {
 	repositories.Connect()
+	Repo := repositories.NewUserRepository(repositories.DB)
+	Services := AuthServices.NewAuthService(Repo)
+	handler := handlers.NewHttpHandler(Services)
 
-	err := os.Setenv("JWT_SECRET", "test")
-	assert.NoError(b, err)
 	app := fiber.New()
+	app.Post("/api/register", handler.Register)
 
-	for i := 0; i < b.N; i++ {
-		apitest.New().
-			HandlerFunc(FiberToHandlerFunc(app)).
-			Post("/api/login").
-			JSON(fmt.Sprintf(`{"email": "a%d@b.c", "password": "11111111"}`, i)).
-			Expect(b).
-			Status(http.StatusUnauthorized).
-			End()
+	payload := map[string]string{
+		"name":     "John Doe",
+		"email":    "john@example.com",
+		"password": "password123",
 	}
+	jsonPayload, _ := json.Marshal(payload)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBuffer(jsonPayload))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := app.Test(req)
+
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var user weather.User
+	json.NewDecoder(resp.Body).Decode(&user)
+
+	assert.Equal(t, "John Doe", user.Name)
+	assert.Equal(t, "john@example.com", user.Email)
 }
 
-func FiberToHandlerFunc(app *fiber.App) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp, err := app.Test(r)
-		if err != nil {
-			panic(err)
-		}
-		defer resp.Body.Close()
+func TestHttpHandler_Login(t *testing.T) {
+	repositories.Connect()
+	Repo := repositories.NewUserRepository(repositories.DB)
+	Services := AuthServices.NewAuthService(Repo)
+	handler := handlers.NewHttpHandler(Services)
 
-		// copy headers
-		for k, vv := range resp.Header {
-			for _, v := range vv {
-				w.Header().Add(k, v)
-			}
-		}
-		w.WriteHeader(resp.StatusCode)
+	app := fiber.New()
+	app.Post("/ap/login", handler.Login)
 
-		// copy body
-		if _, err := io.Copy(w, resp.Body); err != nil {
-			panic(err)
-		}
+	// Login with registered user
+	loginPayload := map[string]string{
+		"email":    "john@example.com",
+		"password": "password123",
 	}
+	loginPayloadBytes, _ := json.Marshal(loginPayload)
+
+	loginReq := httptest.NewRequest(http.MethodPost, "/api/login", bytes.NewBuffer(loginPayloadBytes))
+	loginReq.Header.Set("Content-Type", "application/json")
+
+	loginResp, err := app.Test(loginReq)
+
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, loginResp.StatusCode)
+
+	var response map[string]string
+	json.NewDecoder(loginResp.Body).Decode(&response)
+
+	assert.Equal(t, "success", response["message"])
 }
