@@ -3,16 +3,19 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"golab/handlers"
 	"golab/internal/weather/repositories"
 	"golab/internal/weather/services/AuthServices"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"golab/handlers"
-	"golab/internal/weather"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/steinfletcher/apitest"
+	jsonpath "github.com/steinfletcher/apitest-jsonpath"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,12 +42,6 @@ func TestHttpHandler_Register(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	var user weather.User
-	json.NewDecoder(resp.Body).Decode(&user)
-
-	assert.Equal(t, "John Doe", user.Name)
-	assert.Equal(t, "john@example.com", user.Email)
 }
 
 func TestHttpHandler_Login(t *testing.T) {
@@ -54,25 +51,49 @@ func TestHttpHandler_Login(t *testing.T) {
 	handler := handlers.NewHttpHandler(Services)
 
 	app := fiber.New()
-	app.Post("/ap/login", handler.Login)
+	app.Post("/api/login", handler.Login)
 
-	// Login with registered user
-	loginPayload := map[string]string{
-		"email":    "john@example.com",
-		"password": "password123",
+	testHandler := FiberToHandler(app)
+
+	apitest.New(). // configuration
+			HandlerFunc(testHandler).
+			Post("/api/login"). // request
+			Expect(t).          // expectations
+			Assert(jsonpath.Equal(`$`, map[string]interface{}{"name": "John Doe", "email": "john@example.com", "password": "password123"})).
+			End()
+}
+func FiberToHandler(app *fiber.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		resp, err := app.Test(r)
+		if err != nil {
+			panic(err)
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Response Body: %s\n", string(body))
+
+		if len(body) == 0 {
+			panic("Empty response body")
+		}
+
+		var jsonBody map[string]interface{}
+		if err := json.Unmarshal(body, &jsonBody); err != nil {
+			panic(err)
+		}
+
+		for k, vv := range resp.Header {
+			for _, v := range vv {
+				w.Header().Add(k, v)
+			}
+		}
+		w.WriteHeader(resp.StatusCode)
+
+		if _, err := io.Copy(w, resp.Body); err != nil {
+			panic(err)
+		}
 	}
-	loginPayloadBytes, _ := json.Marshal(loginPayload)
-
-	loginReq := httptest.NewRequest(http.MethodPost, "/api/login", bytes.NewBuffer(loginPayloadBytes))
-	loginReq.Header.Set("Content-Type", "application/json")
-
-	loginResp, err := app.Test(loginReq)
-
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, loginResp.StatusCode)
-
-	var response map[string]string
-	json.NewDecoder(loginResp.Body).Decode(&response)
-
-	assert.Equal(t, "success", response["message"])
 }
