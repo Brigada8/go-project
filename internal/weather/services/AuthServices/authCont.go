@@ -10,8 +10,8 @@ import (
 
 type AuthRepository interface {
 	CreateUser(c *fiber.Ctx, user Models.User) (string, error)
-	FindUserByEmail(c *fiber.Ctx, data map[string]string) (string, error)
-	FindUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (string, error)
+	FindUserByEmail(c *fiber.Ctx, data map[string]string) (Models.User, error)
+	FindUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.User, error)
 }
 
 type AuthService struct {
@@ -28,11 +28,11 @@ func (s *AuthService) AddUser(c *fiber.Ctx, user Models.User) (string, error) {
 	return s.authRepository.CreateUser(c, user)
 }
 
-func (s *AuthService) FindUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (string, error) {
+func (s *AuthService) GetUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.User, error) {
 	return s.authRepository.FindUserByID(c, claims)
 }
 
-func (s *AuthService) FindUserByEmail(c *fiber.Ctx, data map[string]string) (string, error) {
+func (s *AuthService) GetUserByEmail(c *fiber.Ctx, data map[string]string) (Models.User, error) {
 	return s.authRepository.FindUserByEmail(c, data)
 }
 

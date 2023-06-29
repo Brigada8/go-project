@@ -19,9 +19,9 @@ func NewUserRepository(DB *gorm.DB) *UserRepository {
 	return &UserRepository{DB}
 }
 
-func (o *UserRepository) CreateUser(c *fiber.Ctx, user Models.User) error {
+func (o *UserRepository) CreateUser(c *fiber.Ctx, user Models.User) (string, error) {
 	DB.Create(user)
-	return c.JSON(user)
+	return "", c.JSON(user)
 }
 
 func (o *UserRepository) FindUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.User, error) {

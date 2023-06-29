@@ -20,12 +20,12 @@ type HttpHandler struct {
 
 type AuthService interface {
 	AddUser(c *fiber.Ctx, user Models.User) (string, error)
-	GetUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (string, error)
-	GetUserByEmail(c *fiber.Ctx, data map[string]string) (string, error)
-	Destroy(c *fiber.Ctx) (string, error)
+	GetUserByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.User, error)
+	GetUserByEmail(c *fiber.Ctx, data map[string]string) (Models.User, error)
+	Destroy(c *fiber.Ctx) error
 }
 
-func NewHttpHandler(apiService ApiService, authService AuthService) *HttpHandler {
+func NewHttpHandler(authService AuthService) *HttpHandler {
 	return &HttpHandler{
 		authService: authService,
 	}
@@ -126,6 +126,7 @@ func (h *HttpHandler) User(c *fiber.Ctx) error {
 
 	return c.JSON(user)
 }
-func (h *HttpHandler) Logout(c *fiber.Ctx) {
+func (h *HttpHandler) Logout(c *fiber.Ctx) error {
 	h.authService.Destroy(c)
+	return nil
 }
