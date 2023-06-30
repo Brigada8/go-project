@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	Models "golab/internal/weather"
 
 	"github.com/dgrijalva/jwt-go"
@@ -21,8 +22,10 @@ func (o *WeatherRepository) AddToHistory(c *fiber.Ctx, history Models.History) (
 	return "", c.JSON(history)
 }
 
-func (o *WeatherRepository) FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.History, error) {
-	var history Models.History
+func (o *WeatherRepository) FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) ([]Models.History, error) {
+	var history []Models.History
+	fmt.Println(claims.Issuer)
 	DB.Where("user_id = ?", claims.Issuer).Find(&history)
+	fmt.Println(history)
 	return history, nil
 }

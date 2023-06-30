@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"golab/internal/weather"
 	Models "golab/internal/weather"
 	"golab/internal/weather/repositories"
@@ -46,7 +47,9 @@ func (h *HttpHandler) Register(c *fiber.Ctx) error {
 		Password: password,
 	}
 
-	h.authService.AddUser(c, user)
+	if _, err := h.authService.AddUser(c, user); err != nil {
+		fmt.Println(err)
+	}
 
 	return c.JSON(user)
 }
@@ -122,11 +125,15 @@ func (h *HttpHandler) User(c *fiber.Ctx) error {
 
 	var user weather.User
 
-	h.authService.GetUserByID(c, claims)
+	if user, err = h.authService.GetUserByID(c, claims); err != nil {
+		fmt.Println(err)
+	}
 
 	return c.JSON(user)
 }
 func (h *HttpHandler) Logout(c *fiber.Ctx) error {
-	h.authService.Destroy(c)
+	if err := h.authService.Destroy(c); err != nil {
+		fmt.Println(err)
+	}
 	return nil
 }

@@ -22,10 +22,11 @@ func Connect() {
 	DB = connection
 
 	// Migrate the schema
-	DB.AutoMigrate(
+	if err := DB.AutoMigrate(
 		&internal.User{},
-	&internal.History{})
-
+		&internal.History{}); err != nil {
+		fmt.Println(err)
+	}
 
 	fmt.Println("Successfully connected!", DB)
 }

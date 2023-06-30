@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"golab/internal/weather"
 	Models "golab/internal/weather"
 	"net/http"
 	"os"
@@ -18,7 +17,7 @@ import (
 
 type WeatherService interface {
 	AddToHistory(c *fiber.Ctx, history Models.History) (string, error)
-	FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.History, error)
+	FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) ([]Models.History, error)
 	
 }
 
@@ -31,7 +30,6 @@ func NewWeatherHandler(weatherService WeatherService) *WeatherHandler {
 		weatherService: weatherService,
 	}
 }
-
 
 func (h *WeatherHandler) Weather(c *fiber.Ctx) error {
 	err := godotenv.Load()
@@ -107,11 +105,14 @@ func (h *WeatherHandler) Weather(c *fiber.Ctx) error {
 	user, _ := strconv.Atoi(claims.Issuer)
 
 	weather := Models.History{
-		UserID: uint(user),
+		UserID:   uint(user),
 		Location: weatherResp.Location.Country,
+		City: weatherResp.Location.Name,
 	}
 
-	h.weatherService.AddToHistory(c, weather)
+	if _, err := h.weatherService.AddToHistory(c, weather); err != nil {
+		fmt.Println(err)
+	}
 
 	// Set the response body as the JSON result
 	return c.JSON(weatherResp)
@@ -134,9 +135,11 @@ func (h *WeatherHandler) History(c *fiber.Ctx) error {
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
-	var history weather.History
+	var history []Models.History
 
-	h.weatherService.FindHistoryByID(c, claims)
+	if history, err = h.weatherService.FindHistoryByID(c, claims); err != nil {
+		fmt.Println(err)
+	}
 
 	return c.JSON(history)
 }

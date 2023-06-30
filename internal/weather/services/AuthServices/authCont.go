@@ -25,6 +25,7 @@ func NewAuthService(authRepository AuthRepository) *AuthService {
 }
 
 func (s *AuthService) AddUser(c *fiber.Ctx, user Models.User) (string, error) {
+
 	return s.authRepository.CreateUser(c, user)
 }
 

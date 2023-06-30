@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"golab/handlers"
 	"golab/internal/weather/repositories"
 
@@ -19,5 +20,8 @@ func main() {
 	}))
 	handlers.Setup(app)
 
-	app.Listen(":8000")
+	if err := app.Listen(":8000"); err != nil {
+		fmt.Println(err)
+	}
+
 }

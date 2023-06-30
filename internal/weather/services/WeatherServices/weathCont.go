@@ -9,7 +9,7 @@ import (
 
 type WeatherRepository interface {
 	AddToHistory(c *fiber.Ctx, history Models.History) (string, error)
-	FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.History, error)
+	FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) ([]Models.History, error)
 }
 
 type weatherService struct {
@@ -27,6 +27,6 @@ func (s *weatherService) AddToHistory(c *fiber.Ctx, history Models.History) (str
 	return s.weatherRepository.AddToHistory(c, history)
 }
 
-func (s *weatherService) FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.History, error) {
+func (s *weatherService) FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) ([]Models.History, error) {
 	return s.weatherRepository.FindHistoryByID(c, claims)
 }
