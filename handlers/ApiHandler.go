@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+
+	"golab/internal/weather"
 	Models "golab/internal/weather"
 	"net/http"
 	"os"
@@ -16,6 +18,8 @@ import (
 
 type WeatherService interface {
 	AddToHistory(c *fiber.Ctx, history Models.History) (string, error)
+	FindHistoryByID(c *fiber.Ctx, claims *jwt.StandardClaims) (Models.History, error)
+	
 }
 
 type WeatherHandler struct {
@@ -112,3 +116,28 @@ func (h *WeatherHandler) Weather(c *fiber.Ctx) error {
 	// Set the response body as the JSON result
 	return c.JSON(weatherResp)
 }
+
+
+func (h *WeatherHandler) History(c *fiber.Ctx) error {
+	cookie := c.Cookies("jwt")
+
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+
+	if err != nil {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "unauthenticated",
+		})
+	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+
+	var history weather.History
+
+	h.weatherService.FindHistoryByID(c, claims)
+
+	return c.JSON(history)
+}
+

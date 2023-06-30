@@ -23,5 +23,5 @@ func Setup(app *fiber.App) {
 	app.Get("/api/user", Handler.User)
 	// app.Post("/api/forecast", Handler.Forecast)
 // 	app.Get("/api/quality", Handler.Quality)
-	// app.Get("api/history", WeatherHandler.History)
+	app.Get("/api/history", WeatherHandler.History)
 }
