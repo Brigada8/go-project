@@ -23,4 +23,5 @@ func Setup(app *fiber.App) {
 	app.Get("/api/user", Handler.User)
 	app.Post("/api/forecast", WeatherHandler.Forecast)
 	app.Get("/api/history", WeatherHandler.History)
+	app.Post("/api/astronomy", WeatherHandler.Astronomy)
 }

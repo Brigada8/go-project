@@ -153,3 +153,25 @@ func TestHttpHandler_Forecast(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
+
+
+func TestHttpHandler_Astronomy(t *testing.T) {
+	repositories.Connect()
+	WeatherRepo := repositories.NewWeatherRepository(repositories.DB)
+	WeatherServices := WeatherServices.NewWeatherService(WeatherRepo)
+	WeatherHandler := handlers.NewWeatherHandler(WeatherServices)
+
+	app := fiber.New()
+	app.Post("/api/astronomy", WeatherHandler.Astronomy)
+
+	loc := "Dnipro"
+
+	payload := `{"loc":"` + loc + `"}`
+
+	req := httptest.NewRequest(http.MethodPost, "/api/astronomy", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, _ := app.Test(req)
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}

@@ -219,6 +219,73 @@ func (h *WeatherHandler) Forecast(c *fiber.Ctx) error {
 	return c.JSON(weatherResp)
 }
 
+func (h *WeatherHandler) Astronomy(c *fiber.Ctx) error {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+	endpoint := "http://api.weatherapi.com/v1/astronomy.json"
+	apiKey := os.Getenv("API")
+
+	type AstronomyResponse struct {
+		Location struct {
+			Name    string `json:"name"`
+			Country string `json:"country"`
+		} `json:"location"`
+		Astronomy struct {
+			Astro struct {
+				Sunrise string `json:"sunrise"`
+				Sunset string `json:"sunset"`
+				Moonrise string `json:"moonrise"`
+				Moonset string `json:"moonset"`
+				Moon_phase string `json:"moon_phase"`
+				} `json:"astro"`
+				} `json:"astronomy"`
+	}
+
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+
+	request, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		fmt.Println("Failed to create request:", err)
+		return err
+	}
+
+	if data["loc"] == ""{
+		data["loc"] = GetRealIP(request)
+	}
+
+	query := request.URL.Query()
+	query.Add("key", apiKey)
+	query.Add("q", c.Query("location", data["loc"]))
+	request.URL.RawQuery = query.Encode()
+
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Println("Request failed:", err)
+		return err
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	var astronomyResp AstronomyResponse
+	err = json.NewDecoder(response.Body).Decode(&astronomyResp)
+	if err != nil {
+		fmt.Println("Failed to read response body:", err)
+		return err
+	}
+
+
+	// Set the response body as the JSON result
+	return c.JSON(astronomyResp)
+}
+
 
 func GetRealIP(r *http.Request) string {
     IPAddress := r.Header.Get("X-Real-IP")
