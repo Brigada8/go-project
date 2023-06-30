@@ -145,7 +145,7 @@ func (h *WeatherHandler) History(c *fiber.Ctx) error {
 }
 
 func (h *WeatherHandler) Forecast(c *fiber.Ctx) error {
-	days := "7"
+	days := "3"
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -187,6 +187,12 @@ func (h *WeatherHandler) Forecast(c *fiber.Ctx) error {
 		return err
 	}
 
+	if data["loc"] == ""{
+		data["loc"] = GetRealIP(request)
+	}
+
+
+
 	query := request.URL.Query()
 	query.Add("key", apiKey)
 	query.Add("q", c.Query("location", data["loc"]))
@@ -211,4 +217,16 @@ func (h *WeatherHandler) Forecast(c *fiber.Ctx) error {
 
 	// Set the response body as the JSON result
 	return c.JSON(weatherResp)
+}
+
+
+func GetRealIP(r *http.Request) string {
+    IPAddress := r.Header.Get("X-Real-IP")
+    if IPAddress == "" {
+        IPAddress = r.Header.Get("X-Forwarder-For")
+    }
+    if IPAddress == "" {
+        IPAddress = r.RemoteAddr
+    }
+    return IPAddress
 }

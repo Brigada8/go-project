@@ -28,5 +28,5 @@ func Connect() {
 		fmt.Println(err)
 	}
 
-	fmt.Println("Successfully connected!", DB)
+	fmt.Println("Successfully connected!")
 }
