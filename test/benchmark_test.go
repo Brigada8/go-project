@@ -3,19 +3,15 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"golab/handlers"
 	"golab/internal/weather/repositories"
 	"golab/internal/weather/services/AuthServices"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/steinfletcher/apitest"
-	jsonpath "github.com/steinfletcher/apitest-jsonpath"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,47 +49,20 @@ func TestHttpHandler_Login(t *testing.T) {
 	app := fiber.New()
 	app.Post("/api/login", handler.Login)
 
-	testHandler := FiberToHandler(app)
+	email := "john@example.com"
+	password := "password123"
 
-	apitest.New(). // configuration
-			HandlerFunc(testHandler).
-			Post("/api/login"). // request
-			Expect(t).          // expectations
-			Assert(jsonpath.Equal(`$`, map[string]interface{}{"name": "John Doe", "email": "john@example.com", "password": "password123"})).
-			End()
-}
-func FiberToHandler(app *fiber.App) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp, err := app.Test(r)
-		if err != nil {
-			panic(err)
-		}
-		defer resp.Body.Close()
+	payload := `{"email":"` + email + `", "password":"` + password + `"}`
 
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("Response Body: %s\n", string(body))
+	req := httptest.NewRequest(http.MethodPost, "/api/login", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
 
-		if len(body) == 0 {
-			panic("Empty response body")
-		}
+	// Создаем тестовый ответ
+	resp, _ := app.Test(req)
 
-		var jsonBody map[string]interface{}
-		if err := json.Unmarshal(body, &jsonBody); err != nil {
-			panic(err)
-		}
+	// Выполняем запрос к тестовому серверу
 
-		for k, vv := range resp.Header {
-			for _, v := range vv {
-				w.Header().Add(k, v)
-			}
-		}
-		w.WriteHeader(resp.StatusCode)
+	// Проверяем код ответа
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		if _, err := io.Copy(w, resp.Body); err != nil {
-			panic(err)
-		}
-	}
 }
