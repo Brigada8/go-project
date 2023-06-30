@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"fmt"
 	"golab/handlers"
 	"golab/internal/weather/repositories"
 	"golab/internal/weather/services/AuthServices"
@@ -22,17 +23,15 @@ func TestHttpHandler_Register(t *testing.T) {
 	app := fiber.New()
 	app.Post("/api/register", handler.Register)
 
-	name := "John Doe"
-	email := "john@example.com"
+	name := "Johny Doe"
+	email := "johyn@example.com"
 	password := "password123"
 
 	payload := `{"name":"` + name + `","email":"` + email + `", "password":"` + password + `"}`
 
 	req := httptest.NewRequest(http.MethodPost, "/api/register", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
-
 	resp, err := app.Test(req)
-
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -62,4 +61,31 @@ func TestHttpHandler_Login(t *testing.T) {
 	// Проверяем код ответа
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
+}
+
+func TestHttpHandler_Weather(t *testing.T) {
+	repositories.Connect()
+	Repo := repositories.NewUserRepository(repositories.DB)
+	Services := AuthServices.NewAuthService(Repo)
+	handler := handlers.NewHttpHandler(Services)
+
+	app := fiber.New()
+	app.Post("/api/weather", handler.Weather)
+
+	loc := "Kiev"
+
+	payload := `{"loc":"` + loc + `"}`
+
+	req := httptest.NewRequest(http.MethodPost, "/api/weather", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+
+	// Создаем тестовый ответ
+	resp, _ := app.Test(req)
+	fmt.Println("")
+	fmt.Println(resp)
+	fmt.Println("")
+	// Выполняем запрос к тестовому серверу
+
+	// Проверяем код ответа
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
