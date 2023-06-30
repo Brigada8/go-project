@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"fmt"
 	"golab/handlers"
 	"golab/internal/weather/repositories"
 	"golab/internal/weather/services/AuthServices"
@@ -22,8 +23,8 @@ func TestHttpHandler_Register(t *testing.T) {
 	app := fiber.New()
 	app.Post("/api/register", handler.Register)
 
-	name := "John Doe"
-	email := "john@example.com"
+	name := "Johny Doe"
+	email := "johyn@example.com"
 	password := "password123"
 
 	payload := `{"name":"` + name + `","email":"` + email + `", "password":"` + password + `"}`
@@ -32,7 +33,9 @@ func TestHttpHandler_Register(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req)
-
+	fmt.Println("")
+	fmt.Println(resp)
+	fmt.Println("")
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
