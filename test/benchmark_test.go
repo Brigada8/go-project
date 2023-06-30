@@ -1,8 +1,6 @@
 package handlers_test
 
 import (
-	"bytes"
-	"encoding/json"
 	"golab/handlers"
 	"golab/internal/weather/repositories"
 	"golab/internal/weather/services/AuthServices"
@@ -24,14 +22,13 @@ func TestHttpHandler_Register(t *testing.T) {
 	app := fiber.New()
 	app.Post("/api/register", handler.Register)
 
-	payload := map[string]string{
-		"name":     "John Doe",
-		"email":    "john@example.com",
-		"password": "password123",
-	}
-	jsonPayload, _ := json.Marshal(payload)
+	name := "John Doe"
+	email := "john@example.com"
+	password := "password123"
 
-	req := httptest.NewRequest(http.MethodPost, "/api/register", bytes.NewBuffer(jsonPayload))
+	payload := `{"name":"` + name + `","email":"` + email + `", "password":"` + password + `"}`
+
+	req := httptest.NewRequest(http.MethodPost, "/api/register", strings.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := app.Test(req)
