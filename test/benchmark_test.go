@@ -97,3 +97,37 @@ func TestHttpHandler_Weather(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
+
+func TestHttpHandler_History(t *testing.T) {
+	repositories.Connect()
+	WeatherRepo := repositories.NewWeatherRepository(repositories.DB)
+	WeatherServices := WeatherServices.NewWeatherService(WeatherRepo)
+	WeatherHandler := handlers.NewWeatherHandler(WeatherServices)
+	Repo := repositories.NewUserRepository(repositories.DB)
+	Services := AuthServices.NewAuthService(Repo)
+	handler := handlers.NewHttpHandler(Services)
+
+	app := fiber.New()
+	app.Post("/api/login", handler.Login)
+	app.Get("/api/history", WeatherHandler.History)
+
+	email := "john@example.com"
+	password := "password123"
+
+	payload := `{"email":"` + email + `", "password":"` + password + `"}`
+
+	req := httptest.NewRequest(http.MethodPost, "/api/login", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, _ := app.Test(req)
+	jwt := resp.Header.Get("Set-Cookie")
+
+	req_hst := httptest.NewRequest(http.MethodGet, "/api/history", strings.NewReader(payload))
+	req_hst.Header.Set("Content-Type", "application/json")
+	req_hst.Header.Set("Cookie", jwt)
+
+
+	hst_resp, _ := app.Test(req_hst)
+	
+	assert.Equal(t, http.StatusOK, hst_resp.StatusCode)
+}
