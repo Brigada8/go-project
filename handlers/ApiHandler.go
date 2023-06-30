@@ -144,3 +144,71 @@ func (h *WeatherHandler) History(c *fiber.Ctx) error {
 	return c.JSON(history)
 }
 
+func (h *WeatherHandler) Forecast(c *fiber.Ctx) error {
+	days := "7"
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+	endpoint := "http://api.weatherapi.com/v1/forecast.json"
+	apiKey := os.Getenv("API")
+
+	type WeatherResponse struct {
+		Location struct {
+			Name    string `json:"name"`
+			Country string `json:"country"`
+		} `json:"location"`
+		Forecast struct {
+			ForecastDay []struct {
+				Date string `json:"date"`
+				Day struct {
+					MaxTemp float64 `json:"maxtemp_c"`
+					AvgTemp float64 `json:"avgtemp_c"`
+				Condition struct {
+					Text string `json:"text"`
+					Icon string `json:"icon"`
+				} `json:"condition"`
+				} `json:"day"`
+			} `json:"forecastday"`
+		} `json:"forecast"`
+	}
+
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+
+	request, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		fmt.Println("Failed to create request:", err)
+		return err
+	}
+
+	query := request.URL.Query()
+	query.Add("key", apiKey)
+	query.Add("q", c.Query("location", data["loc"]))
+	query.Add("days", c.Query("days", days))
+	request.URL.RawQuery = query.Encode()
+
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Println("Request failed:", err)
+		return err
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	var weatherResp WeatherResponse
+	err = json.NewDecoder(response.Body).Decode(&weatherResp)
+	if err != nil {
+		fmt.Println("Failed to read response body:", err)
+		return err
+	}
+
+
+	// Set the response body as the JSON result
+	return c.JSON(weatherResp)
+}

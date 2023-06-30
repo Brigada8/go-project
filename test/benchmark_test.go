@@ -131,3 +131,25 @@ func TestHttpHandler_History(t *testing.T) {
 	
 	assert.Equal(t, http.StatusOK, hst_resp.StatusCode)
 }
+
+
+func TestHttpHandler_Forecast(t *testing.T) {
+	repositories.Connect()
+	WeatherRepo := repositories.NewWeatherRepository(repositories.DB)
+	WeatherServices := WeatherServices.NewWeatherService(WeatherRepo)
+	WeatherHandler := handlers.NewWeatherHandler(WeatherServices)
+
+	app := fiber.New()
+	app.Post("/api/forecast", WeatherHandler.Forecast)
+
+	loc := "Lviv"
+
+	payload := `{"loc":"` + loc + `"}`
+
+	req := httptest.NewRequest(http.MethodPost, "/api/forecast", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, _ := app.Test(req)
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
