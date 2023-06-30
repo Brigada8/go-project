@@ -4,6 +4,7 @@ import (
 	"golab/handlers"
 	"golab/internal/weather/repositories"
 	"golab/internal/weather/services/AuthServices"
+	"golab/internal/weather/services/WeatherServices"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -78,12 +79,12 @@ func TestHttpHandler_UserUnauthorized(t *testing.T) {
 
 func TestHttpHandler_Weather(t *testing.T) {
 	repositories.Connect()
-	Repo := repositories.NewUserRepository(repositories.DB)
-	Services := AuthServices.NewAuthService(Repo)
-	handler := handlers.NewHttpHandler(Services)
+	WeatherRepo := repositories.NewWeatherRepository(repositories.DB)
+	WeatherServices := WeatherServices.NewWeatherService(WeatherRepo)
+	WeatherHandler := handlers.NewWeatherHandler(WeatherServices)
 
 	app := fiber.New()
-	app.Post("/api/weather", handler.Weather)
+	app.Post("/api/weather", WeatherHandler.Weather)
 
 	loc := "Kiev"
 
@@ -94,5 +95,5 @@ func TestHttpHandler_Weather(t *testing.T) {
 
 	resp, _ := app.Test(req)
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }

@@ -28,7 +28,6 @@ func NewWeatherHandler(weatherService WeatherService) *WeatherHandler {
 	}
 }
 
-
 func (h *WeatherHandler) Weather(c *fiber.Ctx) error {
 	err := godotenv.Load()
 	if err != nil {
@@ -103,11 +102,13 @@ func (h *WeatherHandler) Weather(c *fiber.Ctx) error {
 	user, _ := strconv.Atoi(claims.Issuer)
 
 	weather := Models.History{
-		UserID: uint(user),
+		UserID:   uint(user),
 		Location: weatherResp.Location.Country,
 	}
 
-	h.weatherService.AddToHistory(c, weather)
+	if _, err := h.weatherService.AddToHistory(c, weather); err != nil {
+		fmt.Println(err)
+	}
 
 	// Set the response body as the JSON result
 	return c.JSON(weatherResp)
