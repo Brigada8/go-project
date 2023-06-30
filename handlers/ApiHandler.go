@@ -3,17 +3,33 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	Models "golab/internal/weather"
 	"net/http"
 	"os"
 
+	"strconv"
+
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
 
-type ApiService interface {
+type WeatherService interface {
+	AddToHistory(c *fiber.Ctx, history Models.History) (string, error)
 }
 
-func (h *HttpHandler) Weather(c *fiber.Ctx) error {
+type WeatherHandler struct {
+	weatherService WeatherService
+}
+
+func NewWeatherHandler(weatherService WeatherService) *WeatherHandler {
+	return &WeatherHandler{
+		weatherService: weatherService,
+	}
+}
+
+
+func (h *WeatherHandler) Weather(c *fiber.Ctx) error {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -53,6 +69,100 @@ func (h *HttpHandler) Weather(c *fiber.Ctx) error {
 	query.Add("key", apiKey)
 	query.Add("q", c.Query("location", data["loc"]))
 	request.URL.RawQuery = query.Encode()
+
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Println("Request failed:", err)
+		return err
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	var weatherResp WeatherResponse
+	err = json.NewDecoder(response.Body).Decode(&weatherResp)
+	if err != nil {
+		fmt.Println("Failed to read response body:", err)
+		return err
+	}
+
+	cookie := c.Cookies("jwt")
+
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+
+	if err != nil {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "unauthenticated",
+		})
+	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+
+	user, _ := strconv.Atoi(claims.Issuer)
+
+	weather := Models.History{
+		UserID: uint(user),
+		Location: weatherResp.Location.Country,
+	}
+
+	h.weatherService.AddToHistory(c, weather)
+
+	// Set the response body as the JSON result
+	return c.JSON(weatherResp)
+}
+
+
+func (h *HttpHandler) History(c *fiber.Ctx) error {
+	days := "3"
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+	endpoint := "http://api.weatherapi.com/v1/forecast.json"
+	apiKey := os.Getenv("API")
+
+	type WeatherResponse struct {
+		Location struct {
+			Name    string `json:"name"`
+			Country string `json:"country"`
+		} `json:"location"`
+		Forecast struct {
+			ForecastDay struct {
+				Date string `json:"date"`
+				Day struct {
+					MaxTemp string `json:"maxtemp_c"`
+					AvgTemp string `json:"avgtemp_c"`
+				Condition struct {
+					Text string `json:"text"`
+					Icon string `json:"icon"`
+				} `json:"condition"`
+				} `json:"day"`
+			} `json:"forecastday"`
+		} `json:"forecast"`
+	}
+
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+
+	request, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		fmt.Println("Failed to send forecast request:", err)
+		return err
+	}
+
+	query := request.URL.Query()
+	query.Add("key", apiKey)
+	query.Add("q", c.Query("location", data["loc"]))
+	query.Add("days", days)
+	request.URL.RawQuery = query.Encode()
+	fmt.Println(request.URL.RawQuery)
 
 	response, err := client.Do(request)
 	if err != nil {

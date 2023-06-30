@@ -5,4 +5,5 @@ type User struct {
 	Name     string `gorm:"type:varchar(100);not null"`
 	Email    string `gorm:"type:varchar(100);uniqueIndex;not null"`
 	Password []byte `gorm:"type:varchar(100);not null"`
+	History  []History
 }

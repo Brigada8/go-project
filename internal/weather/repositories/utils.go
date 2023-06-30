@@ -23,7 +23,9 @@ func Connect() {
 
 	// Migrate the schema
 	DB.AutoMigrate(
-		&internal.User{})
+		&internal.User{},
+	&internal.History{})
+
 
 	fmt.Println("Successfully connected!", DB)
 }
